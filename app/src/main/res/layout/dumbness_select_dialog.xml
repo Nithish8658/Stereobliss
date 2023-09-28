@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/material_standard_horizontal_spacing">
+
+    <TextView
+        android:id="@+id/dialog_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="@dimen/material_standard_horizontal_spacing"
+        android:textSize="@dimen/material_font_style_size_subheading"
+        tools:text="@string/preference_random_intelligence_dialog_title" />
+
+    <TextView
+        android:id="@+id/dialog_explanation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dialog_text"
+        android:layout_marginBottom="@dimen/material_standard_horizontal_spacing"
+        android:minLines="2"
+        android:textSize="@dimen/material_font_style_size_body_1"
+        android:layout_alignEnd="@+id/volume_seekbar"
+        android:layout_alignStart="@+id/volume_seekbar"
+        tools:text="@string/preference_random_intelligence_dumb" />
+
+    <SeekBar
+        android:id="@+id/volume_seekbar"
+        android:layout_below="@id/dialog_explanation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/material_standard_horizontal_spacing"
+        android:max="100" />
+</RelativeLayout>

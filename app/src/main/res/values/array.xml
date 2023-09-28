@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <string-array name="preference_artwork_artist_provider_entries">
+        <item>@string/provider_off</item>
+        <item>@string/fanart_tv</item>
+    </string-array>
+
+    <string-array name="preference_artwork_album_provider_entries">
+        <item>@string/provider_off</item>
+        <item>@string/musicbrainz</item>
+        <item>@string/last_fm</item>
+    </string-array>
+
+    <string-array name="preference_default_views">
+        <item>@string/preference_default_view_my_music_artists</item>
+        <item>@string/preference_default_view_my_music_albums</item>
+        <item>@string/preference_default_view_my_music_tracks</item>
+        <item>@string/preference_default_view_my_music_playlists</item>
+        <item>@string/preference_default_view_my_music_bookmarks</item>
+        <item>@string/preference_default_view_my_music_files</item>
+    </string-array>
+
+    <string-array name="preference_library_views">
+        <item>@string/preference_library_view_grid</item>
+        <item>@string/preference_library_view_list</item>
+    </string-array>
+
+    <string-array name="preference_album_sort_orders">
+        <item>@string/preference_album_sort_order_name</item>
+        <item>@string/preference_album_sort_order_year</item>
+    </string-array>
+
+    <string-array name="preference_album_tracks_sort_orders">
+        <item>@string/preference_album_tracks_sort_number</item>
+        <item>@string/preference_album_tracks_sort_name</item>
+    </string-array>
+
+    <string-array name="preference_odyssey_styles">
+        <item>@string/preference_theme_item_indigo</item>
+        <item>@string/preference_theme_item_orange</item>
+        <item>@string/preference_theme_item_deep_orange</item>
+        <item>@string/preference_theme_item_blue</item>
+        <item>@string/preference_theme_item_dark_grey</item>
+        <item>@string/preference_theme_item_brown</item>
+        <item>@string/preference_theme_item_light_green</item>
+        <item>@string/preference_theme_item_red</item>
+        <item>@string/preference_theme_item_oled_dark</item>
+    </string-array>
+
+    <string-array name="preference_library_click">
+        <item>@string/preference_library_click_action_add</item>
+        <item>@string/preference_library_click_action_play</item>
+        <item>@string/preference_library_click_action_play_next</item>
+        <item>@string/preference_library_click_action_clear_and_play</item>
+    </string-array>
+</resources>

@@ -1,0 +1,323 @@
+
+
+<resources>
+    <string name="app_name" translatable="false">Stereobliss</string>
+
+    <!-- permission request -->
+    <string name="permission_request_snackbar_button" translatable="false">@android:string/ok</string>
+    <string name="permission_request_snackbar_explanation">Storage Permission is needed to load music files.</string>
+
+    <!-- nav drawer -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- nav drawer menu -->
+    <string name="nav_menu_my_music">My Music</string>
+    <string name="nav_menu_saved_playlists">Playlists</string>
+    <string name="nav_menu_settings">Settings</string>
+    <string name="nav_menu_bookmarks">Bookmarks</string>
+    <string name="nav_menu_files">Files</string>
+    <string name="nav_menu_info">Information</string>
+
+    <!-- activity titles -->
+    <string name="share_chooser_title">Share track with</string>
+
+    <!-- fragment titles -->
+    <string name="fragment_title_my_music">My Music</string>
+    <string name="fragment_title_saved_playlists">Playlists</string>
+    <string name="fragment_title_settings">Settings</string>
+    <string name="fragment_title_bookmarks">Bookmarks</string>
+    <string name="fragment_title_recent_albums">Recently Added</string>
+
+    <!-- saved playlists fragment -->
+    <string name="empty_saved_playlists_message">No playlists found.</string>
+    <string name="playlist_type_global">Global</string>
+    <string name="playlist_type_local">Local</string>
+
+    <!-- bookmark fragment -->
+    <string name="fragment_bookmarks_tracks">Tracks</string>
+    <string name="empty_bookmarks_message">No bookmarks found.</string>
+
+    <!-- files fragment -->
+    <string name="empty_directory_message">No supported formats or .nomedia file found.</string>
+
+    <!-- my music tab titles -->
+    <string name="fragment_title_artists">Artists</string>
+    <string name="fragment_title_albums">Albums</string>
+    <string name="fragment_title_all_tracks">Tracks</string>
+    <string name="empty_artists_message">No artists found.</string>
+    <string name="empty_tracks_message">No tracks found.</string>
+    <string name="empty_albums_message">No albums found.</string>
+
+    <!-- dialog titles -->
+    <string name="dialog_save_playlist">Save Playlist</string>
+    <string name="dialog_create_bookmark">Create Bookmark</string>
+    <string name="dialog_action_cancel">Cancel</string>
+    <string name="dialog_action_save">Save</string>
+    <string name="dialog_choose_storage_volume_title">Choose storage volume</string>
+    <string name="dialog_choose_bookmark">Choose bookmark</string>
+    <string name="dialog_choose_playlist">Choose playlist</string>
+    <string name="dialog_equalizer_not_found_title">No equalizer available</string>
+    <string name="dialog_equalizer_not_found_message">Your device is missing an equalizer.</string>
+    <string name="error_dialog_ok_action" translatable="false">@android:string/ok</string>
+    <string name="dialog_sleep_timer">Set sleep time</string>
+    <string name="dialog_sleep_timer_separator" translatable="false">:</string>
+    <string name="dialog_sleep_timer_action_start">Start</string>
+    <string name="dialog_sleep_timer_duration_minutes">Minutes</string>
+    <string name="dialog_sleep_timer_duration_seconds">Seconds</string>
+    <string name="dialog_sleep_timer_stop_after_current">Stop playback after currently playing song</string>
+    <string name="dialog_no_browser_found_title">No Browser available</string>
+    <string name="dialog_no_browser_found_message">Your device is missing a browser.</string>
+    <string name="dialog_battery_opt_title">Battery optimization active</string>
+    <string name="dialog_battery_opt_message">
+        Battery optimization for Stereobliss is active.
+        \n\nThis will prevent Stereobliss from automatically resuming playback after background playback was paused.
+        \n\nPlease consider to deactivate this option in order to ensure Stereobliss works correctly.
+    </string>
+    <string name="dialog_battery_opt_action_open_settings">Open settings</string>
+
+    <!-- dialog default names  -->
+    <string name="default_playlist_title">New Playlist</string>
+    <string name="default_bookmark_title">New Bookmark</string>
+    <string name="create_new_bookmark">Create new bookmark</string>
+    <string name="create_new_playlist">Create new playlist</string>
+
+    <!-- actions -->
+    <string name="action_add_album">Add Album</string>
+    <string name="action_add_artist_albums">Add Albums</string>
+    <string name="action_switch_storage_volume">Switch storage volume</string>
+    <string name="action_add_directory">Add directory to queue</string>
+    <string name="action_search">Search</string>
+    <string name="action_add_playlist">Add playlist</string>
+    <string name="action_set_default_directory">Set as default directory</string>
+    <string name="action_start_mediascanner">Update media database here</string>
+
+    <string name="action_reset_artwork">Reset artwork</string>
+
+    <string name="action_wikipedia" translatable="false">Wikipedia</string>
+    <string name="action_wikipedia_album">Open album</string>
+    <string name="action_wikipedia_artist">Open artist</string>
+
+    <string name="action_show_recent_albums">Recent albums</string>
+
+    <string name="action_npv_show_playlist">Show playlist</string>
+    <string name="action_npv_show_cover">Show cover</string>
+    <string name="action_npv_more_options">More options</string>
+
+    <!-- context menu titles -->
+    <string name="context_menu_action_enqueue">Add to queue</string>
+    <string name="context_menu_action_enqueueasnext">Play after current song</string>
+    <string name="context_menu_action_playsong">Play song</string>
+    <string name="context_menu_action_playalbum">Play album</string>
+    <string name="context_menu_action_playalbums">Play albums</string>
+    <string name="context_menu_action_showartist">Show artist</string>
+    <string name="context_menu_action_showalbum">Show album</string>
+    <string name="context_menu_action_removetrack">Remove track</string>
+    <string name="context_menu_action_removesection">Remove section</string>
+    <string name="context_menu_action_playplaylist">Play playlist</string>
+    <string name="context_menu_action_enqueueplaylist">Add playlist</string>
+    <string name="context_menu_action_deleteplaylist">Delete playlist</string>
+    <string name="context_menu_action_resumebookmark">Resume Bookmark</string>
+    <string name="context_menu_action_deletebookmark">Delete Bookmark</string>
+    <string name="context_menu_action_enqueue_folder">Add folder to queue</string>
+    <string name="context_menu_action_play_folder">Play folder</string>
+    <string name="context_menu_action_enqueue_file">Add file to queue</string>
+    <string name="context_menu_action_play_file">Play file</string>
+
+    <!-- popup menu titles -->
+    <string name="popup_menu_action_shuffleplaylist">Shuffle playlist</string>
+    <string name="popup_menu_action_clearplaylist">Clear playlist</string>
+    <string name="popup_menu_action_saveplaylist">Save playlist</string>
+    <string name="popup_menu_action_createbookmark">Create bookmark</string>
+    <string name="popup_menu_action_startequalizer">Open equalizer</string>
+    <string name="popup_menu_action_sharetrack">Share current track</string>
+    <string name="pop_menu_action_start_sleep_timer">Start sleep timer</string>
+    <string name="pop_menu_action_cancel_sleep_timer">Cancel sleep timer</string>
+
+    <!-- templates -->
+    <string name="track_title_template" translatable="false">%1$s - %2$s</string>
+    <string name="track_duration_short_template" translatable="false">%02d:%02d</string>
+    <string name="track_duration_long_template" translatable="false">%02d:%02d:%02d</string>
+    <string name="timestamp_format_pattern" translatable="false">yyyy-MM-dd HH:mm</string>
+
+    <!-- preferences -->
+    <string name="preference_show_album_artists_only_title">Only show album artists</string>
+    <string name="preference_show_album_artists_only_summary">Only show album artists instead of all artists from database.</string>
+
+    <string name="preference_launch_faq">FAQ</string>
+    <string name="preference_launch_faq_text">Information how to get help for this application.</string>
+    <string name="preference_launch_about">About</string>
+    <string name="preference_launch_about_text">Version of the application.</string>
+
+    <string name="preference_theme_title">Theme</string>
+    <string name="preference_theme_summary">Select a different design for the application.</string>
+    <string name="preference_theme_message">Select a theme</string>
+
+    <string name="preference_dark_theme_title">Dark theme</string>
+    <string name="preference_dark_theme_message">Use a dark theme</string>
+
+    <string name="preference_theme_item_indigo">Indigo</string>
+    <string name="preference_theme_item_orange">Orange</string>
+    <string name="preference_theme_item_deep_orange">Deep Orange</string>
+    <string name="preference_theme_item_blue">Blue</string>
+    <string name="preference_theme_item_dark_grey">Dark Grey</string>
+    <string name="preference_theme_item_brown">Brown</string>
+    <string name="preference_theme_item_light_green">Light Green</string>
+    <string name="preference_theme_item_oled_dark">OLED Dark</string>
+    <string name="preference_theme_item_red">Red</string>
+
+    <string name="preference_album_sort_order_title">Artist Albums sort order</string>
+    <string name="preference_album_sort_order_message">Sort by</string>
+    <string name="preference_album_sort_order_summary">Select the sort order for albums of an artist.</string>
+
+    <string name="preference_album_sort_order_name">Name</string>
+    <string name="preference_album_sort_order_year">Year</string>
+
+    <string name="preference_tracks_sort_order_title">Album Tracks sort order</string>
+    <string name="preference_tracks_sort_order_summary">Select the sort order for tracks of an album.</string>
+
+    <string name="preference_album_tracks_sort_number">Tracknumber</string>
+    <string name="preference_album_tracks_sort_name">Displayname (Filename)</string>
+
+    <string name="preference_default_view_title">Default view</string>
+    <string name="preference_default_view_message">Select default view</string>
+    <string name="preference_default_view_summary">Select the default view of the application.</string>
+
+    <string name="preference_default_view_my_music_artists">Artists</string>
+    <string name="preference_default_view_my_music_albums">Albums</string>
+    <string name="preference_default_view_my_music_tracks">All tracks</string>
+    <string name="preference_default_view_my_music_playlists">Playlists</string>
+    <string name="preference_default_view_my_music_bookmarks">Bookmarks</string>
+    <string name="preference_default_view_my_music_files">Files</string>
+
+    <string name="preference_library_view_title">Select library view</string>
+    <string name="preference_library_view_message">Select library view</string>
+    <string name="preference_library_view_summary">Select the type of view that is used for albums and artists.</string>
+
+    <string name="preference_library_view_grid">Grid</string>
+    <string name="preference_library_view_list">List</string>
+
+    <string name="preference_show_artist_image_title">Show artist image</string>
+    <string name="preference_show_artist_image_text">Alternate between the album cover and an image of the artist in the view for the currently playing song.</string>
+
+    <string name="preference_npv_show_playlist_title">Start with playlist view</string>
+    <string name="preference_npv_show_playlist_text">Show the playlist if odyssey is opened via widget or notification while playback is active.</string>
+
+    <string name="preference_library_click_action_title">Track click action</string>
+    <string name="preference_library_click_action_summary">Select action for tracks in library</string>
+    <string name="preference_library_click_action_message">Select the default action to take if you click on a track in the library views.</string>
+
+    <string name="preference_library_click_action_add" translatable="false">@string/context_menu_action_enqueue</string>
+    <string name="preference_library_click_action_play" translatable="false">@string/context_menu_action_playsong</string>
+    <string name="preference_library_click_action_play_next" translatable="false">@string/context_menu_action_enqueueasnext</string>
+    <string name="preference_library_click_action_clear_and_play">Replace and play from index</string>
+
+    <string name="artwork_settings">Artwork settings</string>
+
+    <string name="preference_clear_default_directory_title">Clear default directory</string>
+    <string name="preference_clear_default_directory_summary">Reset the default directory to an available root directory of the device.</string>
+
+    <string name="preference_category_design">Design</string>
+    <string name="preference_category_library">Library</string>
+    <string name="preference_category_other">Other</string>
+
+    <!-- artwork preferences -->
+    <string name="preference_artwork_album_provider_title">Album image provider</string>
+    <string name="preference_artwork_album_provider_summary">Select an provider for album cover images.</string>
+    <string name="preference_artwork_album_provider_message">Select an provider for album cover images.</string>
+
+    <string name="provider_off">Off</string>
+    <string name="musicbrainz" translatable="false">MusicBrainz</string>
+    <string name="last_fm" translatable="false">Last.fm</string>
+    <string name="fanart_tv" translatable="false">Fanart.tv</string>
+
+    <string name="preference_artwork_artist_provider_title">Artist image provider</string>
+    <string name="preference_artwork_artist_provider_summary">Select an provider for artist cover images.</string>
+    <string name="preference_artwork_artist_provider_message">Select an provider for artist cover images.</string>
+
+    <string name="preference_artwork_clear_artist">Clear artist images</string>
+    <string name="preference_artwork_clear_artist_summary">Removes all saved images for artists.</string>
+    <string name="preference_artwork_clear_album">Clear album images</string>
+    <string name="preference_artwork_clear_album_summary">Removes all saved images for albums.</string>
+
+    <string name="preference_artwork_clear_blocked_artist">Clear blocked artist images</string>
+    <string name="preference_artwork_clear_blocked_artist_summary">Removes all entries for artists that where searched for but not found.</string>
+    <string name="preference_artwork_clear_blocked_album">Clear blocked album images</string>
+    <string name="preference_artwork_clear_blocked_album_summary">Removes all entries for albums that where searched for but not found.</string>
+
+    <string name="preference_artwork_bulk_load">Try to load all images for your database.</string>
+    <string name="preference_artwork_bulk_load_summary">This will load a lot of images. Be warned this will take some time. It might result in a temporary rate limit of the provider.</string>
+
+    <string name="preference_artwork_wifi_only_title">Only use WIFI for downloading</string>
+    <string name="preference_artwork_wifi_only_text">Artwork downloading will only take place if the device is connected via WIFI.</string>
+
+    <string name="preference_artwork_hide_artwork_title">Hide artwork</string>
+    <string name="preference_artwork_hide_artwork_text">Disables the whole artwork visibility.</string>
+
+    <string name="preference_use_english_wikipedia_title">Use English Wikipedia</string>
+    <string name="preference_use_english_wikipedia_text">Use the English Wikipedia version to lookup pages.</string>
+
+    <string name="preference_hide_media_on_lockscreen_title">Private notification</string>
+    <string name="preference_hide_media_on_lockscreen_text">Hide media information on the lockscreen (depends on your system lock screen privacy settings).</string>
+
+    <string name="preference_artwork_use_local_images_title">Use local album images</string>
+    <string name="preference_artwork_use_local_images_text">Ignore album artworks found in the Android Media Database and use local images instead. If no local image is found the selected album artwork provider will be used.</string>
+
+    <string name="preference_category_artwork_settings">Artwork settings</string>
+    <string name="preference_category_artwork_database_cleanup">Database cleanup</string>
+    <string name="preference_category_artwork_other_actions">Other actions</string>
+
+    <!-- About activity -->
+
+    <string name="activity_about_version">Version:</string>
+    <!-- will be used to display the git commit hash - only used in debug builds -->
+
+
+
+
+    <!-- PBS working message -->
+    <string name="playbackservice_working">Please wait …</string>
+
+    <!-- Bulk downloader service -->
+    <string name="downloader_notification_title">Bulk download running</string>
+    <string name="downloader_notification_remaining_images">Downloaded images:</string>
+    <string name="downloader_notification_initialize">Initialize download</string>
+
+    <string name="bulk_download_notice_title">Image download</string>
+    <string name="bulk_download_notice_text">Downloading a large amount of images puts heavy load on the servers of the service you chose. It may occur that a server load prevents downloading of images. The downloader will then cancel its action if it detects an overload.\n\nPlease consider donating to the artwork services.</string>
+
+    <!-- Media scanner service -->
+    <string name="mediascanner_notification_title">Updating media database</string>
+    <string name="mediascanner_notification_text">Scanning file %1$d/%2$d</string>
+
+    <!-- Notification channel names -->
+    <string name="notification_channel_playback">Playback</string>
+    <string name="notification_channel_downloader">Downloader</string>
+    <string name="notification_channel_library_scanner">Library scanner</string>
+
+    <!-- Playback notification -->
+    <string name="notification_sensitive_content_replacement">Content hidden</string>
+
+
+    <!-- Snackbar -->
+    <string name="snackbar_sleep_timer_confirmation_message">Sleep timer set</string>
+    <string name="snackbar_uri_not_supported_message">The selected path %1$s is not supported.</string>
+
+    <string name="preference_resume_step_size_title">Automatic rewind</string>
+    <string name="preference_resume_step_size_text">Number of seconds the playback is rewound after resume.</string>
+
+    <plurals name="preference_resume_step_size_dialog_title">
+        <item quantity="one">Step size: %d second</item>
+        <item quantity="other">Step size: %d seconds</item>
+    </plurals>
+
+    <string name="preference_random_intelligence_dialog_title">Random intelligence: %d %%</string>
+    <string name="preference_random_intelligence_dumber">Random selects tracks completely random with no regard to the artists.</string>
+    <string name="preference_random_intelligence_dumb">Random mostly selects tracks completely random with almost no regard to the artists.</string>
+    <string name="preference_random_intelligence_balanced">Random selects tracks balanced between artists - and track-based selection.</string>
+    <string name="preference_random_intelligence_intelligent">Random mostly selects tracks based on the artist.</string>
+    <string name="preference_random_intelligence_more_intelligent">Random completely selects tracks based on the artist.</string>
+
+    <string name="preference_smart_random_title">Smart random</string>
+    <string name="preference_smart_random_text">Select a random selection preference. This option allows random playback to be more uniformly distributed (for artists). This is useful for playlists with a lot of tracks of one artist and few tracks of other artists.</string>
+</resources>

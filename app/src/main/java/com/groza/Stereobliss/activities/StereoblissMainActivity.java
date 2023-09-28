@@ -1,0 +1,1060 @@
+
+
+package com.groza.Stereobliss.activities;
+
+import android.Manifest;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.RemoteException;
+import android.provider.Settings;
+import android.transition.Slide;
+import android.view.ContextMenu;
+import android.view.Gravity;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import com.groza.Stereobliss.adapter.CurrentPlaylistAdapter;
+import com.groza.Stereobliss.dialogs.SaveDialog;
+import com.groza.Stereobliss.fragments.AlbumTracksFragment;
+import com.groza.Stereobliss.fragments.ArtistAlbumsFragment;
+import com.groza.Stereobliss.fragments.ArtworkSettingsFragment;
+import com.groza.Stereobliss.fragments.BookmarksFragment;
+import com.groza.Stereobliss.fragments.FilesFragment;
+import com.groza.Stereobliss.fragments.InformationSettingsFragment;
+import com.groza.Stereobliss.fragments.MyMusicFragment;
+import com.groza.Stereobliss.fragments.StereoblissFragment;
+import com.groza.Stereobliss.fragments.PlaylistTracksFragment;
+import com.groza.Stereobliss.fragments.RecentAlbumsFragment;
+import com.groza.Stereobliss.fragments.SavedPlaylistsFragment;
+import com.groza.Stereobliss.fragments.SettingsFragment;
+import com.groza.Stereobliss.listener.OnAlbumSelectedListener;
+import com.groza.Stereobliss.listener.OnArtistSelectedListener;
+import com.groza.Stereobliss.listener.OnDirectorySelectedListener;
+import com.groza.Stereobliss.listener.OnPlaylistSelectedListener;
+import com.groza.Stereobliss.listener.OnRecentAlbumsSelectedListener;
+import com.groza.Stereobliss.listener.OnSaveDialogListener;
+import com.groza.Stereobliss.listener.OnStartSleepTimerListener;
+import com.groza.Stereobliss.listener.ToolbarAndFABCallback;
+import com.groza.Stereobliss.models.AlbumModel;
+import com.groza.Stereobliss.models.PlaylistModel;
+import com.groza.Stereobliss.utils.FileExplorerHelper;
+import com.groza.Stereobliss.utils.FileUtils;
+import com.groza.Stereobliss.utils.PermissionHelper;
+import com.groza.Stereobliss.views.CurrentPlaylistView;
+
+import com.groza.Stereobliss.R;
+
+import com.groza.Stereobliss.models.ArtistModel;
+import com.groza.Stereobliss.utils.MusicLibraryHelper;
+import com.groza.Stereobliss.utils.ThemeUtils;
+import com.groza.Stereobliss.views.NowPlayingView;
+
+import java.util.List;
+
+public class StereoblissMainActivity extends GenericActivity
+        implements NavigationView.OnNavigationItemSelectedListener, ToolbarAndFABCallback,
+        OnSaveDialogListener, NowPlayingView.NowPlayingDragStatusReceiver, SettingsFragment.OnArtworkSettingsRequestedCallback,
+        OnArtistSelectedListener, OnAlbumSelectedListener, OnRecentAlbumsSelectedListener,
+        OnPlaylistSelectedListener, OnDirectorySelectedListener, OnStartSleepTimerListener {
+
+    public enum REQUESTEDVIEW {
+        NONE,
+        NOWPLAYING,
+        SETTINGS
+    }
+
+    private ActionBarDrawerToggle mDrawerToggle;
+
+    private DRAG_STATUS mNowPlayingDragStatus;
+
+    private DRAG_STATUS mSavedNowPlayingDragStatus = null;
+
+    private VIEW_SWITCHER_STATUS mNowPlayingViewSwitcherStatus;
+
+    private VIEW_SWITCHER_STATUS mSavedNowPlayingViewSwitcherStatus = null;
+
+    private FileExplorerHelper mFileExplorerHelper = null;
+
+    public static final String MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW = "com.gateshipone.odyssey.requestedview";
+
+    public static final String MAINACTIVITY_SAVED_INSTANCE_NOW_PLAYING_DRAG_STATUS = "StereoblissMainActivity.NowPlayingDragStatus";
+
+    public static final String MAINACTIVITY_SAVED_INSTANCE_NOW_PLAYING_VIEW_SWITCHER_CURRENT_VIEW = "StereoblissMainActivity.NowPlayingViewSwitcherCurrentView";
+
+    private Uri mSentUri;
+
+    private boolean mShowNPV = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        boolean switchToSettings = false;
+
+        // restore drag state
+        if (savedInstanceState != null) {
+            mSavedNowPlayingDragStatus = DRAG_STATUS.values()[savedInstanceState.getInt(MAINACTIVITY_SAVED_INSTANCE_NOW_PLAYING_DRAG_STATUS)];
+            mSavedNowPlayingViewSwitcherStatus = VIEW_SWITCHER_STATUS.values()[savedInstanceState.getInt(MAINACTIVITY_SAVED_INSTANCE_NOW_PLAYING_VIEW_SWITCHER_CURRENT_VIEW)];
+        } else {
+            // if no savedInstanceState is present the activity is started for the first time so check the intent
+            final Intent intent = getIntent();
+            if (intent != null) {
+                if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
+                    // odyssey was opened by a file so save the uri for later usage when the service is running
+                    mSentUri = intent.getData();
+                } else {
+                    // odyssey was opened by widget or notification
+                    final Bundle extras = intent.getExtras();
+
+                    if (extras != null) {
+                        REQUESTEDVIEW requestedView = REQUESTEDVIEW.values()[extras.getInt(MAINACTIVITY_INTENT_EXTRA_REQUESTEDVIEW, REQUESTEDVIEW.NONE.ordinal())];
+
+                        switch (requestedView) {
+                            case NONE:
+                                break;
+                            case NOWPLAYING:
+                                mShowNPV = true;
+                                break;
+                            case SETTINGS:
+                                switchToSettings = true;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Get preferences
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_stereobliss_main);
+
+        // restore elevation behaviour as pre 24 support lib
+        AppBarLayout layout = findViewById(R.id.appbar);
+        layout.setStateListAnimator(null);
+        ViewCompat.setElevation(layout, 0);
+
+        // get fileexplorerhelper
+        mFileExplorerHelper = FileExplorerHelper.getInstance();
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        // enable back navigation
+        final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
+
+        if (actionBar != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer != null) {
+            mDrawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawer.addDrawerListener(mDrawerToggle);
+            mDrawerToggle.syncState();
+        }
+
+        int navId = switchToSettings ? R.id.nav_settings : getDefaultViewID();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        if (navigationView != null) {
+            navigationView.setNavigationItemSelectedListener(this);
+            navigationView.setCheckedItem(navId);
+        }
+
+        // register context menu for currentPlaylistListView
+        ListView currentPlaylistListView = findViewById(R.id.list_linear_listview);
+        registerForContextMenu(currentPlaylistListView);
+
+        if (findViewById(R.id.fragment_container) != null && (savedInstanceState == null)) {
+            Fragment fragment;
+
+            if (navId == R.id.nav_saved_playlists) {
+                fragment = SavedPlaylistsFragment.newInstance();
+            } else if (navId == R.id.nav_bookmarks) {
+                fragment = BookmarksFragment.newInstance();
+
+            } else if (navId == R.id.nav_files) {
+                // open the default directory
+                List<String> storageVolumesList = mFileExplorerHelper.getStorageVolumes(getApplicationContext());
+
+                String defaultDirectory = "/";
+
+                if (!storageVolumesList.isEmpty()) {
+                    // choose the latest used storage volume as default
+                    defaultDirectory = sharedPref.getString(getString(R.string.pref_file_browser_root_dir_key), storageVolumesList.get(0));
+                }
+
+                fragment = FilesFragment.newInstance(defaultDirectory, storageVolumesList.contains(defaultDirectory));
+            } else if (navId == R.id.nav_settings) {
+                fragment = SettingsFragment.newInstance();
+            } else if (navId == R.id.nav_my_music) {
+                fragment = MyMusicFragment.newInstance(getDefaultTab());
+            } else {
+                fragment = MyMusicFragment.newInstance(getDefaultTab());
+            }
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, fragment);
+            transaction.commit();
+        }
+
+        // ask for permissions
+        requestPermissionExternalStorage();
+
+        // check if battery optimization is active
+        checkBatteryOptimization();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+        NowPlayingView nowPlayingView = findViewById(R.id.now_playing_layout);
+        if (nowPlayingView != null) {
+            nowPlayingView.registerDragStatusReceiver(this);
+
+            // ask for permissions
+            requestPermissionExternalStorage();
+
+            /*
+             * Check if the activity got an extra in its intend to show the nowplayingview directly.
+             * If yes then pre set the dragoffset of the draggable helper.
+             */
+            if (mShowNPV) {
+                nowPlayingView.setDragOffset(0.0f);
+
+
+                // check preferences if the playlist should be shown
+                final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
+                final boolean showPlaylist = sharedPref.getBoolean(getString(R.string.pref_npv_show_playlist_key), getResources().getBoolean(R.bool.pref_npv_show_playlist_default));
+
+                if (showPlaylist) {
+                    mNowPlayingViewSwitcherStatus = VIEW_SWITCHER_STATUS.PLAYLIST_VIEW;
+                    nowPlayingView.setViewSwitcherStatus(mNowPlayingViewSwitcherStatus);
+                }
+                mShowNPV = false;
+            } else {
+                // set drag status
+                if (mSavedNowPlayingDragStatus == DRAG_STATUS.DRAGGED_UP) {
+                    nowPlayingView.setDragOffset(0.0f);
+                } else if (mSavedNowPlayingDragStatus == DRAG_STATUS.DRAGGED_DOWN) {
+                    nowPlayingView.setDragOffset(1.0f);
+                }
+                mSavedNowPlayingDragStatus = null;
+
+                // set view switcher status
+                if (mSavedNowPlayingViewSwitcherStatus != null) {
+                    nowPlayingView.setViewSwitcherStatus(mSavedNowPlayingViewSwitcherStatus);
+                    mNowPlayingViewSwitcherStatus = mSavedNowPlayingViewSwitcherStatus;
+                }
+                mSavedNowPlayingViewSwitcherStatus = null;
+            }
+            nowPlayingView.onResume();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        // save drag status of the nowplayingview
+        savedInstanceState.putInt(MAINACTIVITY_SAVED_INSTANCE_NOW_PLAYING_DRAG_STATUS, mNowPlayingDragStatus.ordinal());
+
+        // save the cover/playlist view status of the nowplayingview
+        savedInstanceState.putInt(MAINACTIVITY_SAVED_INSTANCE_NOW_PLAYING_VIEW_SWITCHER_CURRENT_VIEW, mNowPlayingViewSwitcherStatus.ordinal());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+
+        NowPlayingView nowPlayingView = findViewById(R.id.now_playing_layout);
+        if (nowPlayingView != null) {
+            nowPlayingView.registerDragStatusReceiver(null);
+
+            nowPlayingView.onPause();
+        }
+    }
+
+    @Override
+    void onServiceConnected() {
+        // the service is ready so check if odyssey was opened by a file
+        checkUri();
+    }
+
+    @Override
+    void onServiceDisconnected() {
+
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else if (mNowPlayingDragStatus == DRAG_STATUS.DRAGGED_UP) {
+            NowPlayingView nowPlayingView = findViewById(R.id.now_playing_layout);
+            if (nowPlayingView != null) {
+                View coordinatorLayout = findViewById(R.id.main_coordinator_layout);
+                coordinatorLayout.setVisibility(View.VISIBLE);
+                nowPlayingView.minimize();
+            }
+        } else if (fragmentManager.findFragmentById(R.id.fragment_container) instanceof FilesFragment) {
+            // handle back pressed events for the files fragment manually
+
+            FilesFragment fragment = (FilesFragment) fragmentManager.findFragmentById(R.id.fragment_container);
+
+            if (fragment.isRootDirectory()) {
+                // current directory is a root directory so handle back press normally
+                super.onBackPressed();
+            } else {
+                if (fragmentManager.getBackStackEntryCount() == 0) {
+                    // if backstack is empty but root directory not reached create an new fragment with the parent directory
+                    List<String> storageVolumesList = mFileExplorerHelper.getStorageVolumes(getApplicationContext());
+
+                    String parentDirectoryPath = fragment.getCurrentDirectory().getParent();
+
+                    onDirectorySelected(parentDirectoryPath, storageVolumesList.contains(parentDirectoryPath), false);
+                } else {
+                    // back stack not empty so handle back press normally
+                    super.onBackPressed();
+                }
+            }
+        } else {
+            super.onBackPressed();
+
+            // enable navigation bar when backstack empty
+            if (fragmentManager.getBackStackEntryCount() == 0) {
+                mDrawerToggle.setDrawerIndicatorEnabled(true);
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+
+        final FragmentManager fragmentManager = getSupportFragmentManager();
+
+        if (item.getItemId() == android.R.id.home) {
+            if (fragmentManager.findFragmentById(R.id.fragment_container) instanceof FilesFragment) {
+                // handle click events for the files fragment manually
+
+                final FilesFragment fragment = (FilesFragment) fragmentManager.findFragmentById(R.id.fragment_container);
+
+                if (fragment.isRootDirectory()) {
+                    // current directory is a root directory so enable navigation drawer
+
+                    mDrawerToggle.setDrawerIndicatorEnabled(true);
+
+                    if (mDrawerToggle.onOptionsItemSelected(item)) {
+                        return true;
+                    }
+                } else {
+                    if (fragmentManager.getBackStackEntryCount() == 0) {
+                        // if backstack is empty but root directory not reached create an new fragment with the parent directory
+                        final List<String> storageVolumesList = mFileExplorerHelper.getStorageVolumes(getApplicationContext());
+
+                        final String parentDirectoryPath = fragment.getCurrentDirectory().getParent();
+
+                        // don't add this this directory to the backstack
+                        onDirectorySelected(parentDirectoryPath, storageVolumesList.contains(parentDirectoryPath), false);
+                    } else {
+                        // back stack not empty so just use the standard back press mechanism
+                        onBackPressed();
+                    }
+                }
+
+            } else if (fragmentManager.getBackStackEntryCount() > 0) {
+                onBackPressed();
+            } else {
+                // back stack empty so enable navigation drawer
+
+                mDrawerToggle.setDrawerIndicatorEnabled(true);
+
+                if (mDrawerToggle.onOptionsItemSelected(item)) {
+                    return true;
+                }
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        if (v.getId() == R.id.list_linear_listview && mNowPlayingDragStatus == DRAG_STATUS.DRAGGED_UP) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.context_menu_current_playlist, menu);
+
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+
+            try {
+                if (getPlaybackService().getCurrentIndex() == info.position) {
+                    menu.findItem(R.id.view_current_playlist_action_playnext).setVisible(false);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
+            CurrentPlaylistView currentPlaylistView = findViewById(R.id.now_playing_playlist);
+
+            // check if track has a valid album id
+            long albumId = currentPlaylistView.getAlbumId(info.position);
+            AlbumModel tmpAlbum = MusicLibraryHelper.createAlbumModelFromId(albumId, getApplicationContext());
+
+            menu.findItem(R.id.view_current_playlist_action_showalbum).setVisible(tmpAlbum != null);
+
+            // check if track has a valid artist id
+            String artistTitle = currentPlaylistView.getArtistTitle(info.position);
+            long artistId = MusicLibraryHelper.getArtistIDFromName(artistTitle, this);
+
+            menu.findItem(R.id.view_current_playlist_action_showartist).setVisible(artistId != -1);
+
+            // check the view type
+            if (currentPlaylistView.getItemViewType(info.position) == CurrentPlaylistAdapter.VIEW_TYPES.TYPE_SECTION_TRACK_ITEM) {
+                menu.findItem(R.id.view_current_playlist_action_remove_section).setVisible(true);
+            }
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        final ContextMenu.ContextMenuInfo menuInfo = item.getMenuInfo();
+
+        // we have two types of adapter context menuinfo classes so we have to make sure the current item contains the correct type of menuinfo
+        if (menuInfo instanceof AdapterView.AdapterContextMenuInfo) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+
+            CurrentPlaylistView currentPlaylistView = findViewById(R.id.now_playing_playlist);
+
+            if (currentPlaylistView != null && mNowPlayingDragStatus == DRAG_STATUS.DRAGGED_UP) {
+                final int itemId = item.getItemId();
+
+                if (itemId == R.id.view_current_playlist_action_playnext) {
+                    currentPlaylistView.enqueueTrackAsNext(info.position);
+                    return true;
+                } else if (itemId == R.id.view_current_playlist_action_remove_track) {
+                    currentPlaylistView.removeTrack(info.position);
+                    return true;
+                } else if (itemId == R.id.view_current_playlist_action_remove_section) {
+                    currentPlaylistView.removeSection(info.position);
+                    return true;
+                } else if (itemId == R.id.view_current_playlist_action_showalbum) {
+                    long albumId = currentPlaylistView.getAlbumId(info.position);
+                    AlbumModel tmpAlbum = MusicLibraryHelper.createAlbumModelFromId(albumId, getApplicationContext());
+
+                    View coordinatorLayout = findViewById(R.id.main_coordinator_layout);
+                    coordinatorLayout.setVisibility(View.VISIBLE);
+
+                    NowPlayingView nowPlayingView = findViewById(R.id.now_playing_layout);
+                    if (nowPlayingView != null) {
+                        nowPlayingView.minimize();
+                    }
+
+                    onAlbumSelected(tmpAlbum, null);
+                    return true;
+                } else if (itemId == R.id.view_current_playlist_action_showartist) {
+                    String artistTitle = currentPlaylistView.getArtistTitle(info.position);
+                    long artistId = MusicLibraryHelper.getArtistIDFromName(artistTitle, this);
+
+                    View coordinatorLayout = findViewById(R.id.main_coordinator_layout);
+                    coordinatorLayout.setVisibility(View.VISIBLE);
+
+                    NowPlayingView nowPlayingView = findViewById(R.id.now_playing_layout);
+                    if (nowPlayingView != null) {
+                        nowPlayingView.minimize();
+                    }
+                    onArtistSelected(new ArtistModel(artistTitle, artistId), null);
+                    return true;
+                }
+
+                return super.onContextItemSelected(item);
+            }
+        }
+
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle navigation view item clicks here.
+        final int id = item.getItemId();
+
+        final View coordinatorLayout = findViewById(R.id.main_coordinator_layout);
+        coordinatorLayout.setVisibility(View.VISIBLE);
+
+        final NowPlayingView nowPlayingView = findViewById(R.id.now_playing_layout);
+        if (nowPlayingView != null) {
+            nowPlayingView.minimize();
+        }
+
+        final FragmentManager fragmentManager = getSupportFragmentManager();
+
+        // clear backstack
+        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+        Fragment fragment = null;
+
+        if (id == R.id.nav_my_music) {
+            fragment = MyMusicFragment.newInstance(getDefaultTab());
+        } else if (id == R.id.nav_saved_playlists) {
+            fragment = SavedPlaylistsFragment.newInstance();
+        } else if (id == R.id.nav_bookmarks) {
+            fragment = BookmarksFragment.newInstance();
+        } else if (id == R.id.nav_files) {
+            // open the default directory
+            final List<String> storageVolumesList = mFileExplorerHelper.getStorageVolumes(getApplicationContext());
+
+            String defaultDirectory = "/";
+
+            if (!storageVolumesList.isEmpty()) {
+                // choose the latest used storage volume as default
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+                defaultDirectory = sharedPref.getString(getString(R.string.pref_file_browser_root_dir_key), storageVolumesList.get(0));
+            }
+
+            fragment = FilesFragment.newInstance(defaultDirectory, storageVolumesList.contains(defaultDirectory));
+        } else if (id == R.id.nav_settings) {
+            fragment = SettingsFragment.newInstance();
+        } else if (id == R.id.nav_information) {
+            fragment = InformationSettingsFragment.newInstance();
+        }
+
+        final DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer != null) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
+
+        final FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
+
+        return true;
+    }
+
+    @Override
+    public void onArtistSelected(ArtistModel artist, Bitmap bitmap) {
+        // Create fragment and give it an argument for the selected article
+        ArtistAlbumsFragment newFragment = ArtistAlbumsFragment.newInstance(artist, bitmap);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        // set enter / exit animation
+        newFragment.setEnterTransition(new Slide(Gravity.BOTTOM));
+        newFragment.setExitTransition(new Slide(Gravity.TOP));
+
+        // Replace whatever is in the fragment_container view with this
+        // fragment,
+        // and add the transaction to the back stack so the user can navigate
+        // back
+        transaction.replace(R.id.fragment_container, newFragment);
+        transaction.addToBackStack("ArtistFragment");
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
+    @Override
+    public void onAlbumSelected(AlbumModel album, Bitmap bitmap) {
+        // Create fragment and give it an argument for the selected article
+        AlbumTracksFragment newFragment = AlbumTracksFragment.newInstance(album, bitmap);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        // set enter / exit animation
+        newFragment.setEnterTransition(new Slide(Gravity.BOTTOM));
+        newFragment.setExitTransition(new Slide(Gravity.TOP));
+
+        // Replace whatever is in the fragment_container view with this
+        // fragment,
+        // and add the transaction to the back stack so the user can navigate
+        // back
+        transaction.replace(R.id.fragment_container, newFragment);
+        transaction.addToBackStack("AlbumTracksFragment");
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
+    @Override
+    public void onDirectorySelected(final String dirPath, final boolean isRootDirectory) {
+        onDirectorySelected(dirPath, isRootDirectory, true);
+    }
+
+    private void onDirectorySelected(final String dirPath, final boolean isRootDirectory, final boolean addToBackStack) {
+        // Create fragment and give it an argument for the selected directory
+        final FilesFragment newFragment = FilesFragment.newInstance(dirPath, isRootDirectory);
+
+        final FragmentManager fragmentManager = getSupportFragmentManager();
+
+        final FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        if (!isRootDirectory) {
+            // no root directory so set a enter / exit transition
+            final int layoutDirection = getResources().getConfiguration().getLayoutDirection();
+            newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, layoutDirection)));
+            newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, layoutDirection)));
+        }
+
+        transaction.replace(R.id.fragment_container, newFragment);
+        if (!isRootDirectory && addToBackStack) {
+            // add fragment only to the backstack if it's not a root directory
+            transaction.addToBackStack("FilesFragment");
+        }
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
+    @Override
+    public void onStartSleepTimer(final long durationMS, final boolean stopAfterCurrent) {
+        try {
+            // save used duration to initialize the duration picker next time with this value
+            SharedPreferences.Editor sharedPrefEditor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            sharedPrefEditor.putLong(getString(R.string.pref_last_used_sleep_timer_key), durationMS);
+            sharedPrefEditor.putBoolean(getString(R.string.pref_last_used_sleep_timer_stop_after_current_key), stopAfterCurrent);
+            sharedPrefEditor.apply();
+
+            getPlaybackService().startSleepTimer(durationMS, stopAfterCurrent);
+
+            // show a snackbar to inform the user that the sleep timer is now set
+            View layout = findViewById(R.id.drawer_layout);
+            if (layout != null) {
+                Snackbar sb = Snackbar.make(layout, R.string.snackbar_sleep_timer_confirmation_message, Snackbar.LENGTH_SHORT);
+                // style the snackbar text
+                TextView sbText = sb.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                sbText.setTextColor(ThemeUtils.getThemeColor(this, R.attr.odyssey_color_text_accent));
+                sb.show();
+            }
+        } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onStatusChanged(DRAG_STATUS status) {
+        mNowPlayingDragStatus = status;
+        if (status == DRAG_STATUS.DRAGGED_UP) {
+            View coordinatorLayout = findViewById(R.id.main_coordinator_layout);
+            /*
+             * Use View.GONE instead INVISIBLE to hide view behind NowPlayingView,
+             * fixes overlaying Fragments on FragmentTransaction combined with minimizing the NPV in one action
+             */
+            coordinatorLayout.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void onSwitchedViews(VIEW_SWITCHER_STATUS view) {
+        mNowPlayingViewSwitcherStatus = view;
+    }
+
+    @Override
+    public void onStartDrag() {
+        View coordinatorLayout = findViewById(R.id.main_coordinator_layout);
+        coordinatorLayout.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * This method smoothly fades out the alpha value of the statusbar to give
+     * a transition if the user pulls up the NowPlayingView.
+     *
+     * @param pos The position of the NowplayingView as float (in the range 0.0 - 1.0)
+     */
+    @Override
+    public void onDragPositionChanged(float pos) {
+        // Get the primary color of the active theme from the helper.
+        int newColor = ThemeUtils.getThemeColor(this, R.attr.colorPrimary);
+
+        // Calculate the offset depending on the floating point position (0.0-1.0 of the view)
+        // Shift by 24 bit to set it as the A from ARGB and set all remaining 24 bits to 1 to
+        int alphaOffset = (((255 - (int) (255.0 * pos)) << 24) | 0xFFFFFF);
+        // and with this mask to set the new alpha value.
+        newColor &= (alphaOffset);
+        getWindow().setStatusBarColor(newColor);
+    }
+
+    @Override
+    public void onPlaylistSelected(PlaylistModel playlistModel) {
+        // Create fragment and give it an argument for the selected playlist
+        PlaylistTracksFragment newFragment = PlaylistTracksFragment.newInstance(playlistModel);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        // set enter / exit animation
+        final int layoutDirection = getResources().getConfiguration().getLayoutDirection();
+        newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, layoutDirection)));
+        newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, layoutDirection)));
+
+        // Replace whatever is in the fragment_container view with this
+        // fragment,
+        // and add the transaction to the back stack so the user can navigate
+        // back
+        transaction.replace(R.id.fragment_container, newFragment);
+        transaction.addToBackStack("PlaylistTracksFragment");
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
+    private void requestPermissionExternalStorage() {
+        // ask for permissions
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                View layout = findViewById(R.id.drawer_layout);
+                if (layout != null) {
+                    Snackbar sb = Snackbar.make(layout, R.string.permission_request_snackbar_explanation, Snackbar.LENGTH_INDEFINITE);
+                    sb.setAction(R.string.permission_request_snackbar_button, view -> ActivityCompat.requestPermissions(StereoblissMainActivity.this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            PermissionHelper.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE));
+                    // style the snackbar text
+                    TextView sbText = sb.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                    sbText.setTextColor(ThemeUtils.getThemeColor(this, R.attr.odyssey_color_text_accent));
+                    sb.show();
+                }
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        PermissionHelper.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PermissionHelper.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE) {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                // permission was granted, yay!
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+                if (fragment instanceof MyMusicFragment) {
+                    ((MyMusicFragment) fragment).refresh();
+                } else if (fragment instanceof StereoblissFragment) {
+                    ((StereoblissFragment<?>) fragment).refreshContent();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onSaveObject(String title, SaveDialog.OBJECTTYPE type) {
+        NowPlayingView nowPlayingView = findViewById(R.id.now_playing_layout);
+        if (nowPlayingView != null) {
+            // check type to identify which object should be saved
+            switch (type) {
+                case PLAYLIST:
+                    nowPlayingView.savePlaylist(title);
+                    break;
+                case BOOKMARK:
+                    nowPlayingView.createBookmark(title);
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void openArtworkSettings() {
+        // Create fragment and give it an argument for the selected directory
+        ArtworkSettingsFragment newFragment = ArtworkSettingsFragment.newInstance();
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        // set enter / exit animation
+        final int layoutDirection = getResources().getConfiguration().getLayoutDirection();
+        newFragment.setEnterTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.START, layoutDirection)));
+        newFragment.setExitTransition(new Slide(GravityCompat.getAbsoluteGravity(GravityCompat.END, layoutDirection)));
+
+        transaction.addToBackStack("ArtworkSettingsFragment");
+
+        transaction.replace(R.id.fragment_container, newFragment);
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
+    @Override
+    public void setupFAB(View.OnClickListener listener) {
+        FloatingActionButton playButton = findViewById(R.id.odyssey_play_button);
+
+        if (playButton != null) {
+            if (listener == null) {
+                playButton.hide();
+            } else {
+                playButton.show();
+            }
+
+            playButton.setOnClickListener(listener);
+        }
+    }
+
+    @Override
+    public void setupToolbar(String title, boolean scrollingEnabled, boolean drawerIndicatorEnabled, boolean showImage) {
+        // set drawer state
+        mDrawerToggle.setDrawerIndicatorEnabled(drawerIndicatorEnabled);
+
+        ImageView collapsingImage = findViewById(R.id.collapsing_image);
+        View collapsingImageGradientTop = findViewById(R.id.collapsing_image_gradient_top);
+        View collapsingImageGradientBottom = findViewById(R.id.collapsing_image_gradient_bottom);
+        if (collapsingImage != null && collapsingImageGradientTop != null && collapsingImageGradientBottom != null) {
+            if (showImage) {
+                collapsingImage.setVisibility(View.VISIBLE);
+                collapsingImageGradientTop.setVisibility(View.VISIBLE);
+                collapsingImageGradientBottom.setVisibility(View.VISIBLE);
+            } else {
+                collapsingImage.setVisibility(View.GONE);
+                collapsingImage.setImageDrawable(null);
+                collapsingImageGradientTop.setVisibility(View.GONE);
+                collapsingImageGradientBottom.setVisibility(View.GONE);
+            }
+        }
+        // set scrolling behaviour
+        CollapsingToolbarLayout toolbar = findViewById(R.id.collapsing_toolbar);
+        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) toolbar.getLayoutParams();
+        params.height = -1;
+
+        if (scrollingEnabled && !showImage) {
+            toolbar.setTitleEnabled(false);
+            setTitle(title);
+
+            params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL + AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED + AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+        } else if (!scrollingEnabled && showImage && collapsingImage != null) {
+            toolbar.setTitleEnabled(true);
+            toolbar.setTitle(title);
+
+            params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED + AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL);
+        } else {
+            toolbar.setTitleEnabled(false);
+            setTitle(title);
+            params.setScrollFlags(0);
+        }
+    }
+
+    @Override
+    public void setupToolbarImage(Bitmap bm) {
+        ImageView collapsingImage = findViewById(R.id.collapsing_image);
+        if (collapsingImage != null) {
+            collapsingImage.setImageBitmap(bm);
+
+            // FIXME DIRTY HACK: Manually fix the toolbar size to the screen width
+            CollapsingToolbarLayout toolbar = findViewById(R.id.collapsing_toolbar);
+            AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) toolbar.getLayoutParams();
+
+            params.height = getWindow().getDecorView().getMeasuredWidth();
+
+            // Always expand the toolbar to show the complete image
+            AppBarLayout appbar = findViewById(R.id.appbar);
+            appbar.setExpanded(true, false);
+        }
+    }
+
+    @Override
+    public void onRecentAlbumsSelected() {
+        // Create fragment
+        RecentAlbumsFragment newFragment = RecentAlbumsFragment.newInstance();
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        // set enter / exit animation
+        newFragment.setEnterTransition(new Slide(Gravity.BOTTOM));
+        newFragment.setExitTransition(new Slide(Gravity.TOP));
+
+        // Replace whatever is in the fragment_container view with this
+        // fragment,
+        // and add the transaction to the back stack so the user can navigate
+        // back
+        transaction.replace(R.id.fragment_container, newFragment);
+        transaction.addToBackStack("RecentAlbumsFragment");
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
+    private MyMusicFragment.DEFAULTTAB getDefaultTab() {
+        // Read default view preference
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String defaultView = sharedPref.getString(getString(R.string.pref_start_view_key), getString(R.string.pref_view_default));
+
+        // the default tab for mymusic
+        MyMusicFragment.DEFAULTTAB defaultTab = MyMusicFragment.DEFAULTTAB.ALBUMS;
+
+        if (defaultView.equals(getString(R.string.pref_view_my_music_artists_key))) {
+            defaultTab = MyMusicFragment.DEFAULTTAB.ARTISTS;
+        } else if (defaultView.equals(getString(R.string.pref_view_my_music_albums_key))) {
+            defaultTab = MyMusicFragment.DEFAULTTAB.ALBUMS;
+        } else if (defaultView.equals(getString(R.string.pref_view_my_music_tracks_key))) {
+            defaultTab = MyMusicFragment.DEFAULTTAB.TRACKS;
+        }
+
+        return defaultTab;
+    }
+
+    private int getDefaultViewID() {
+        // Read default view preference
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String defaultView = sharedPref.getString(getString(R.string.pref_start_view_key), getString(R.string.pref_view_default));
+
+        // the nav resource id to mark the right item in the nav drawer
+        int navId = -1;
+
+        if (defaultView.equals(getString(R.string.pref_view_my_music_artists_key))) {
+            navId = R.id.nav_my_music;
+        } else if (defaultView.equals(getString(R.string.pref_view_my_music_albums_key))) {
+            navId = R.id.nav_my_music;
+        } else if (defaultView.equals(getString(R.string.pref_view_my_music_tracks_key))) {
+            navId = R.id.nav_my_music;
+        } else if (defaultView.equals(getString(R.string.pref_view_playlists_key))) {
+            navId = R.id.nav_saved_playlists;
+        } else if (defaultView.equals(getString(R.string.pref_view_bookmarks_key))) {
+            navId = R.id.nav_bookmarks;
+        } else if (defaultView.equals(getString(R.string.pref_view_files_key))) {
+            navId = R.id.nav_files;
+        }
+
+        return navId;
+    }
+
+    /**
+     * Check if odyssey was opened via a file.
+     * <p>
+     * This method will play the selected file if the mSentUri is valid.
+     */
+    private void checkUri() {
+        if (mSentUri != null) {
+            final String filePath = FileUtils.getFilePathFromUri(this, mSentUri);
+
+            if (filePath != null) {
+                try {
+                    getPlaybackService().playURI(filePath);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                // show a snackbar to inform the user that the selected file could not be played
+                final View layout = findViewById(R.id.drawer_layout);
+                if (layout != null) {
+                    final String errorMsg = getString(R.string.snackbar_uri_not_supported_message, mSentUri.toString());
+                    final Snackbar sb = Snackbar.make(layout, errorMsg, Snackbar.LENGTH_SHORT);
+                    // style the snackbar text
+                    final TextView sbText = sb.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                    sbText.setTextColor(ThemeUtils.getThemeColor(this, R.attr.odyssey_color_text_accent));
+                    sb.show();
+                }
+            }
+
+            mSentUri = null;
+        }
+    }
+
+    /**
+     * Check if battery optimization is disabled for odyssey.
+     * Otherwise a dialog will show up to ask the user to change the setting but only on
+     * the first start of odyssey.
+     */
+    private void checkBatteryOptimization() {
+        // battery optimization is only available with Android M or above
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            final boolean showBatteryOptDialog = sharedPref.getBoolean(getString(R.string.pref_battery_opt_dialog_key), true);
+
+            // check battery optimization only if the dialog wasn't shown before
+            if (showBatteryOptDialog) {
+                final PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+
+                if (!pm.isIgnoringBatteryOptimizations(getPackageName())) {
+                    // ask for permission
+                    final MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+                    builder.setTitle(getResources().getString(R.string.dialog_battery_opt_title));
+                    builder.setMessage(getResources().getString(R.string.dialog_battery_opt_message));
+                    builder.setPositiveButton(R.string.dialog_battery_opt_action_open_settings, (dialog, id) -> {
+                        disableBatteryOptimizationDialog();
+                        final Intent intent = new Intent();
+                        /*
+                         * We are not allowed to request the permission directly or to open
+                         * the app battery settings. Therefore we will just open the general
+                         * settings screen where the user can disable the battery optimization
+                         * for every app and has to search for Odyssey manually in it.
+                         */
+                        intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+
+                        startActivity(intent);
+                    });
+                    builder.setNegativeButton(R.string.dialog_action_cancel, (dialog, which) -> disableBatteryOptimizationDialog());
+                    // make sure to disable the dialog in each cancel event
+                    builder.setOnCancelListener(dialog -> disableBatteryOptimizationDialog());
+
+                    final AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper method to disable the battery optimization check and dialog
+     */
+    private void disableBatteryOptimizationDialog() {
+        SharedPreferences.Editor sharedPrefEditor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        sharedPrefEditor.putBoolean(getString(R.string.pref_battery_opt_dialog_key), false);
+        sharedPrefEditor.apply();
+    }
+}

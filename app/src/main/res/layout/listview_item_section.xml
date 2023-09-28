@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minHeight="@dimen/material_list_item_height"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/section_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/material_list_item_height_section"
+            android:orientation="horizontal"
+            android:paddingEnd="@dimen/material_screen_edge_spacing">
+
+            <ViewSwitcher
+                android:id="@+id/section_header_image_switcher"
+                android:layout_width="@dimen/material_list_item_height_section"
+                android:layout_height="@dimen/material_list_item_height_section"
+                android:animateFirstView="true"
+                android:inAnimation="@anim/fadein"
+                android:outAnimation="@anim/fadeout">
+
+                <ImageView
+                    android:id="@+id/section_header_image_placeholder"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/cover_picture_musicimage"
+                    app:tint="?attr/odyssey_color_text_background_primary"
+                    android:contentDescription="@null" />
+
+                <ImageView
+                    android:id="@+id/section_header_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="@null" />
+            </ViewSwitcher>
+
+            <TextView
+                android:id="@+id/section_header_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:fontFamily="sans-serif-regular"
+                android:paddingStart="@dimen/material_standard_horizontal_spacing"
+                android:singleLine="true"
+                android:textSize="@dimen/material_font_style_size_title"
+                tools:text="section header" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_divider_size"
+            android:layout_marginStart="@dimen/material_screen_edge_spacing"
+            android:layout_marginEnd="@dimen/material_screen_edge_spacing"
+            android:background="?attr/odyssey_color_divider" />
+    </LinearLayout>
+
+    <include
+        android:id="@+id/basic_listview_item"
+        layout="@layout/listview_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/section_header" />
+</RelativeLayout>

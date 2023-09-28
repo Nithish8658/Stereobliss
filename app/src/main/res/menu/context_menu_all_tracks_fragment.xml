@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/fragment_all_tracks_action_enqueue"
+        app:showAsAction="never"
+        android:title="@string/context_menu_action_enqueue" />
+
+    <item
+        android:id="@+id/fragment_all_tracks_action_enqueueasnext"
+        app:showAsAction="never"
+        android:title="@string/context_menu_action_enqueueasnext" />
+
+    <item
+        android:id="@+id/fragment_all_tracks_action_play"
+        app:showAsAction="never"
+        android:title="@string/context_menu_action_playsong" />
+
+    <item
+        android:id="@+id/fragment_all_tracks_showartist"
+        app:showAsAction="never"
+        android:title="@string/context_menu_action_showartist" />
+</menu>

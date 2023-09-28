@@ -1,0 +1,316 @@
+/* */
+
+package com.groza.Stereobliss.models.Trackmodel;
+
+import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+
+import com.groza.Stereobliss.models.GenericModel;
+
+public class TrackModel implements GenericModel, Parcelable {
+
+    /**
+     * The name of the track
+     */
+    private final String mTrackName;
+
+    /**
+     * The name of the artist of the track
+     */
+    private final String mTrackArtistName;
+
+    /**
+     * The id of the artist of the track
+     */
+    private final long mTrackArtistId;
+
+    /**
+     * The name of the album of the track
+     */
+    private final String mTrackAlbumName;
+
+    /**
+     * The id of the album of the track
+     */
+    private final long mTrackAlbumId;
+
+    /**
+     * The url path to the related media file
+     */
+    private final Uri mTrackUri;
+
+    /**
+     * The duration of the track in ms
+     */
+    private long mTrackDuration;
+
+    /**
+     * The number of the track (combined cd and tracknumber)
+     */
+    private final int mTrackNumber;
+
+    /**
+     * The unique id of the track in the mediastore
+     */
+    private final long mTrackId;
+
+    /**
+     * The date as an integer when this track was added to the device
+     */
+    private final int mDateAdded;
+
+    public TrackModel(String name, String artistName, long artistId, String albumName, long albumId, long duration, int trackNumber, Uri uri, long trackId, int dateAdded) {
+        if (name != null) {
+            mTrackName = name;
+        } else {
+            mTrackName = "";
+        }
+
+        if (artistName != null) {
+            mTrackArtistName = artistName;
+        } else {
+            mTrackArtistName = "";
+        }
+
+        mTrackArtistId = artistId;
+
+        if (albumName != null) {
+            mTrackAlbumName = albumName;
+        } else {
+            mTrackAlbumName = "";
+        }
+
+        mTrackAlbumId = albumId;
+
+        mTrackDuration = duration;
+        mTrackNumber = trackNumber;
+
+        mTrackUri = uri;
+
+        mTrackId = trackId;
+
+        mDateAdded = dateAdded;
+    }
+
+    /**
+     * Constructs a TrackModel instance with the given parameters.
+     */
+    public TrackModel(String name, String artistName, long artistId, String albumName, long albumId, long duration, int trackNumber, Uri uri, long trackId) {
+        this(name, artistName, artistId, albumName, albumId, duration, trackNumber, uri, trackId, -1);
+    }
+
+    /**
+     * Constructs a TrackModel with default values
+     */
+    public TrackModel() {
+        this(null, null, -1, null, -1, 0, 0, null, -1);
+    }
+
+    /**
+     * Constructs a TrackModel from a Parcel.
+     * <p>
+     * see {@link Parcelable}
+     */
+    protected TrackModel(Parcel in) {
+        mTrackName = in.readString();
+        mTrackArtistName = in.readString();
+        mTrackArtistId = in.readLong();
+        mTrackAlbumName = in.readString();
+        mTrackAlbumId = in.readLong();
+        mTrackUri = (Uri) in.readValue(Uri.class.getClassLoader());
+        mTrackDuration = in.readLong();
+        mTrackNumber = in.readInt();
+        mTrackId = in.readLong();
+        mDateAdded = in.readInt();
+    }
+
+    /**
+     * Provide CREATOR field that generates a TrackModel instance from a Parcel.
+     * <p/>
+     * see {@link Parcelable}
+     */
+    public static final Creator<TrackModel> CREATOR = new Creator<TrackModel>() {
+        @Override
+        public TrackModel createFromParcel(Parcel in) {
+            return new TrackModel(in);
+        }
+
+        @Override
+        public TrackModel[] newArray(int size) {
+            return new TrackModel[size];
+        }
+    };
+
+    /**
+     * Return the name of the track
+     */
+    public String getTrackName() {
+        return mTrackName;
+    }
+
+    /**
+     * Return the name of the track, or the file basename if empty
+     */
+    public String getTrackDisplayedName() {
+        if (mTrackName.isEmpty()) {
+            // TODO add replacement here
+            if (mTrackUri == null) {
+                return "";
+            } else {
+                return mTrackUri.getPath() == null ? "" : mTrackUri.getPath();
+            }
+        }
+
+        return mTrackName;
+    }
+
+    /**
+     * Return the name of the artist
+     */
+    public String getTrackArtistName() {
+        return mTrackArtistName;
+    }
+
+    /**
+     * Return the id of the artist
+     */
+    public long getTrackArtistId() {
+        return mTrackArtistId;
+    }
+
+    /**
+     * Return the name of the album
+     */
+    public String getTrackAlbumName() {
+        return mTrackAlbumName;
+    }
+
+    /**
+     * Return the album id
+     */
+    public long getTrackAlbumId() {
+        return mTrackAlbumId;
+    }
+
+    /**
+     * Return the duration of the track
+     */
+    public long getTrackDuration() {
+        return mTrackDuration;
+    }
+
+    /**
+     * Set the duration of the track
+     *
+     * @param trackDuration the new duration in ms
+     */
+    public void setTrackDuration(long trackDuration) {
+        mTrackDuration = trackDuration;
+    }
+
+    /**
+     * Return the number of the track
+     */
+    public int getTrackNumber() {
+        return mTrackNumber;
+    }
+
+    /**
+     * Return the url of the track
+     */
+    @Nullable
+    public Uri getTrackUri() {
+        return mTrackUri;
+    }
+
+    public String getTrackUriString() {
+        if (mTrackUri == null) {
+            return "";
+        } else {
+            return mTrackUri.toString();
+        }
+    }
+
+    /**
+     * Return the unique id of the track
+     */
+    public long getTrackId() {
+        return mTrackId;
+    }
+
+    /**
+     * Return the section title for the TrackModel
+     * <p/>
+     * The section title is the name of the track.
+     */
+    @Override
+    public String getSectionTitle() {
+        return mTrackName;
+    }
+
+    public int getDateAdded() {
+        return mDateAdded;
+    }
+
+    /**
+     * Equals method for the TrackModel
+     * <p/>
+     * TrackModel instances are equal if they have the same id
+     */
+    @Override
+    public boolean equals(Object model) {
+        if (model == null) {
+            return false;
+        }
+        if (model == this) {
+            return true;
+        }
+        if (!(model instanceof TrackModel)) {
+            return false;
+        }
+        TrackModel track = (TrackModel) model;
+
+        return (this.mTrackId == track.mTrackId);
+    }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     * <p/>
+     * see {@link Parcelable}
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     * <p/>
+     * see {@link Parcelable}
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mTrackName);
+        dest.writeString(mTrackArtistName);
+        dest.writeLong(mTrackArtistId);
+        dest.writeString(mTrackAlbumName);
+        dest.writeLong(mTrackAlbumId);
+        dest.writeValue(mTrackUri);
+        dest.writeLong(mTrackDuration);
+        dest.writeInt(mTrackNumber);
+        dest.writeLong(mTrackId);
+        dest.writeInt(mDateAdded);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Track: " + getTrackNumber() + ':' + getTrackName() + '-' + getTrackAlbumName();
+    }
+}

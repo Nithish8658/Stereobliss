@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<full-backup-content>
+    <exclude
+        domain="database"
+        path="OdysseyArtworkDB" />
+    <exclude
+        domain="database"
+        path="OdysseyStatesDB" />
+    <exclude
+        domain="file"
+        path="artworks" />
+</full-backup-content>

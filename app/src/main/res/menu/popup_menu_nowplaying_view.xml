@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:id="@+id/action_group_playlist">
+        <item
+            android:id="@+id/view_nowplaying_action_shuffleplaylist"
+            android:title="@string/popup_menu_action_shuffleplaylist"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/view_nowplaying_action_saveplaylist"
+            android:title="@string/popup_menu_action_saveplaylist"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/view_nowplaying_action_clearplaylist"
+            android:title="@string/popup_menu_action_clearplaylist"
+            app:showAsAction="never" />
+    </group>
+
+    <item
+        android:id="@+id/view_nowplaying_action_createbookmark"
+        android:title="@string/popup_menu_action_createbookmark"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/view_nowplaying_action_startequalizer"
+        android:title="@string/popup_menu_action_startequalizer"
+        app:showAsAction="never" />
+
+    <item android:title="@string/action_wikipedia">
+        <menu>
+            <item
+                android:id="@+id/action_wikipedia_album"
+                android:title="@string/action_wikipedia_album" />
+            <item
+                android:id="@+id/action_wikipedia_artist"
+                android:title="@string/action_wikipedia_artist" />
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/view_nowplaying_action_share_track"
+        android:title="@string/popup_menu_action_sharetrack"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/view_nowplaying_action_start_sleep_timer"
+        android:title="@string/pop_menu_action_start_sleep_timer"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/view_nowplaying_action_cancel_sleep_timer"
+        android:title="@string/pop_menu_action_cancel_sleep_timer"
+        app:showAsAction="never" />
+
+</menu>

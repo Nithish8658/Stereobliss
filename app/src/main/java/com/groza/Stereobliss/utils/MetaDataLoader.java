@@ -1,0 +1,147 @@
+/* */
+
+package com.groza.Stereobliss.utils;
+
+import android.content.Context;
+import android.media.MediaMetadataRetriever;
+import android.net.Uri;
+
+import com.groza.Stereobliss.models.Trackmodel.TrackModel;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Helper to load meta data of tracks async.
+ */
+public class MetaDataLoader {
+
+    public interface MetaDataLoaderListener {
+        void metaDataLoaderFinished(Map<String, TrackModel> parsedTracks);
+    }
+
+    private final MetaDataLoaderListener mMetaDataLoaderListener;
+
+    public MetaDataLoader(final MetaDataLoaderListener metaDataLoaderListener) {
+        mMetaDataLoaderListener = metaDataLoaderListener;
+    }
+
+    /**
+     * Updates the meta data of the tracks in the given list.
+     *
+     * @param context The {@link Context} used to open the file and access the mediadb.
+     * @param tracks  The track list to check for unknown tracks.
+     */
+    public void getTrackListMetaData(final Context context, final List<TrackModel> tracks) {
+        if (null == tracks || tracks.isEmpty()) {
+            return;
+        }
+
+        HashMap<String, String> unknownTracks = new HashMap<>();
+
+        for (TrackModel track : tracks) {
+            if (track.getTrackAlbumId() == -1) {
+                // add only tracks with an empty albumkey
+                unknownTracks.put(track.getTrackUriString(), track.getTrackName());
+            }
+        }
+
+        Thread loaderThread = new Thread(new TrackListMetaDataExtractorRunner(context, unknownTracks));
+        loaderThread.start();
+    }
+
+    /**
+     * Create a {@link TrackModel} for the given url.
+     * <p>
+     * This method will try to retrieve the track in the mediadb or try to extract the meta data using the {@link MediaMetadataRetriever}.
+     * If both methods fail a dummy {@link TrackModel} will be created.
+     *
+     * @param context    The {@link Context} used to open the file and access the mediadb.
+     * @param trackTitle The title for the {@link TrackModel} if a dummy track is created.
+     * @param trackUri   The given url for track as a String.
+     * @return A valid {@link TrackModel}.
+     */
+    private TrackModel readTrackMetaData(final Context context, final String trackTitle, final Uri trackUri) {
+        // lookup the current file in the media db
+        final TrackModel track = MusicLibraryHelper.getTrackForUri(trackUri, context);
+
+        if (track != null) {
+            return track;
+        }
+
+        try {
+            // try to read the file metadata
+            final MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(context.getContentResolver().openFileDescriptor(trackUri, "r").getFileDescriptor());
+
+            final String title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+
+            final String durationString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+
+            long duration = 0;
+
+            if (durationString != null) {
+                try {
+                    duration = Long.parseLong(durationString);
+                } catch (NumberFormatException e) {
+                    duration = 0;
+                }
+            }
+
+            final String noString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER);
+
+            int no = -1;
+
+            if (noString != null) {
+                try {
+                    if (noString.contains("/")) {
+                        // if string has the format (trackNumber / numberOfTracks)
+                        String[] components = noString.split("/");
+                        if (components.length > 0) {
+                            no = Integer.parseInt(components[0]);
+                        }
+                    } else {
+                        no = Integer.parseInt(noString);
+                    }
+                } catch (NumberFormatException e) {
+                    no = -1;
+                }
+            }
+
+            final String artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+            final String album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+
+            final long albumId = MusicLibraryHelper.verifyAlbumId(-1, album, artist, context);
+
+            return new TrackModel(title, artist, -1, album, albumId, duration, no, trackUri, -1);
+        } catch (Exception e) {
+            // something went wrong so just create a dummy track with the given title
+            return new TrackModel(trackTitle, null, -1, null, -1, 0, -1, trackUri, -1);
+        }
+    }
+
+    private class TrackListMetaDataExtractorRunner implements Runnable {
+
+        private final Context mContext;
+
+        private final Map<String, String> mUnknownTracks;
+
+        TrackListMetaDataExtractorRunner(final Context context, final Map<String, String> unknownTracks) {
+            mContext = context;
+            mUnknownTracks = unknownTracks;
+        }
+
+        @Override
+        public void run() {
+            Map<String, TrackModel> mParsedTracks = new HashMap<>();
+
+            for (Map.Entry<String, String> unknownTrack : mUnknownTracks.entrySet()) {
+                final Uri trackUri = Uri.parse(unknownTrack.getKey());
+                mParsedTracks.put(unknownTrack.getKey(), readTrackMetaData(mContext, unknownTrack.getValue(), trackUri));
+            }
+
+            mMetaDataLoaderListener.metaDataLoaderFinished(mParsedTracks);
+        }
+    }
+}

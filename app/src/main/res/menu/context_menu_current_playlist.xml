@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/view_current_playlist_action_remove_track"
+        app:showAsAction="never"
+        android:title="@string/context_menu_action_removetrack" />
+
+    <item
+        android:id="@+id/view_current_playlist_action_remove_section"
+        app:showAsAction="never"
+        android:visible="false"
+        android:title="@string/context_menu_action_removesection" />
+
+    <item
+        android:id="@+id/view_current_playlist_action_playnext"
+        app:showAsAction="never"
+        android:title="@string/context_menu_action_enqueueasnext" />
+
+    <item
+        android:id="@+id/view_current_playlist_action_showalbum"
+        app:showAsAction="never"
+        android:title="@string/context_menu_action_showalbum" />
+
+    <item
+        android:id="@+id/view_current_playlist_action_showartist"
+        app:showAsAction="never"
+        android:title="@string/context_menu_action_showartist" />
+
+</menu>

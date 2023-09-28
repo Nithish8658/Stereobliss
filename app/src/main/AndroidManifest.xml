@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <application
+        android:name="com.groza.Stereobliss.StereoblissApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Stereobliss"
+        android:largeHeap="true"
+        android:requestLegacyExternalStorage="true"
+        android:supportsRtl="true"
+        android:theme="@color/colorAccent_indigo"
+        tools:targetApi="s">
+
+        <activity
+            android:name="com.groza.Stereobliss.activities.StereoblissMainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.App.Starting">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MUSIC_PLAYER" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_MUSIC" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/mpeg" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/mp4" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/x-wav" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/ogg" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/ogg" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/aac" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/aac-adts" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/x-matroska" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/midi" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError,GoogleAppIndexingWarning">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/flac" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.groza.Stereobliss.activities.StereoblissAboutActivity"
+            android:label="About"
+            android:parentActivityName="com.groza.Stereobliss.activities.StereoblissMainActivity" />
+
+
+
+        <service
+            android:name="com.groza.Stereobliss.playbackservice.PlaybackService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback"
+            android:label="OdysseyPlaybackService"
+            android:process=":serviceProcess">
+            <intent-filter>
+                <action android:name="com.groza.Stereobliss.playbackservice.IOdysseyPlaybackService" />
+                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
+                <action android:name="org.gateshipone.odyssey.newtrackinfo" />
+                <action android:name="org.gateshipone.odyssey.togglepause" />
+                <action android:name="org.gateshipone.odyssey.stop" />
+                <action android:name="org.gateshipone.odyssey.previous" />
+                <action android:name="org.gateshipone.odyssey.next" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="com.groza.Stereobliss.artwork.BulkDownloadService"
+            android:exported="false"
+            android:process=":downloadProcess" />
+        <service
+            android:name="com.groza.Stereobliss.mediascanner.MediaScannerService"
+            android:exported="false"
+            android:process=":mediascanProcess" />
+
+        <receiver
+            android:name="com.groza.Stereobliss.playbackservice.RemoteControlReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.groza.Stereobliss.widget.StereoblissWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="org.gateshipone.odyssey.newtrackinfo" />
+                <action android:name="org.gateshipone.odyssey.hideartworkchanged" />
+                <action android:name="org.gateshipone.odyssey.togglepause" />
+                <action android:name="org.gateshipone.odyssey.stop" />
+                <action android:name="org.gateshipone.odyssey.previous" />
+                <action android:name="org.gateshipone.odyssey.next" />
+                <action android:name="org.gateshipone.odyssey.action_new_artwork_ready" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info" />
+        </receiver>
+    </application>
+
+</manifest>

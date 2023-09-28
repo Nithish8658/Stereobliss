@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/material_standard_horizontal_spacing">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <NumberPicker
+            android:id="@+id/duration_minutes_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/divider"
+            android:theme="@style/AppThemeLight.NumberPicker" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/duration_minutes_picker"
+            android:layout_alignStart="@id/duration_minutes_picker"
+            android:layout_alignEnd="@id/duration_minutes_picker"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            android:text="@string/dialog_sleep_timer_duration_minutes" />
+
+        <TextView
+            android:id="@+id/divider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/duration_minutes_picker"
+            android:layout_alignBottom="@id/duration_minutes_picker"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="@dimen/material_standard_horizontal_spacing"
+            android:layout_marginEnd="@dimen/material_standard_horizontal_spacing"
+            android:gravity="center_vertical"
+            android:text="@string/dialog_sleep_timer_separator" />
+
+        <NumberPicker
+            android:id="@+id/duration_seconds_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/divider"
+            android:theme="@style/AppThemeLight.NumberPicker" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/duration_seconds_picker"
+            android:layout_alignStart="@id/duration_seconds_picker"
+            android:layout_alignEnd="@id/duration_seconds_picker"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            android:text="@string/dialog_sleep_timer_duration_seconds" />
+    </RelativeLayout>
+
+    <CheckBox
+        android:id="@+id/duration_stop_after_current_checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/material_content_spacing"
+        android:text="@string/dialog_sleep_timer_stop_after_current" />
+</LinearLayout>

@@ -1,0 +1,222 @@
+/* */
+
+package com.groza.Stereobliss.utils;
+
+import android.os.Build;
+import android.provider.BaseColumns;
+import android.provider.MediaStore;
+
+import androidx.annotation.RequiresApi;
+
+/**
+ * Class that contains several arrays that can be used to access different informations from the {@link MediaStore}.
+ */
+class MediaStoreProjections {
+
+    interface ProjectionAlbums {
+        /**
+         * projection array
+         */
+        String[] PROJECTION = getProjectionAlbums();
+
+        /**
+         * fast access to projection entries
+         */
+        String ALBUM = PROJECTION[0];
+        String NUMER_OF_SONGS = PROJECTION[1];
+        @Deprecated
+        String ALBUM_ART = PROJECTION[2];
+        String ARTIST = PROJECTION[3];
+        String FIRST_YEAR = PROJECTION[4];
+        String LAST_YEAR = PROJECTION[5];
+        String ID = PROJECTION[6];
+        @RequiresApi(api = Build.VERSION_CODES.Q)
+        String ARTIST_ID = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ? PROJECTION[7] : "";
+    }
+
+    interface ProjectionArtists {
+        /**
+         * projection array
+         */
+        String[] PROJECTION = getProjectionArtists();
+
+        /**
+         * fast access to projection entries
+         */
+        String ARTIST = PROJECTION[0];
+        String NUMBER_OF_TRACKS = PROJECTION[1];
+        String NUMBER_OF_ALBUMS = PROJECTION[2];
+        String ID = PROJECTION[3];
+    }
+
+    interface ProjectionTracks {
+        /**
+         * projection array
+         */
+        String[] PROJECTION = getProjectionTracks();
+
+        /**
+         * fast access to projection entries
+         */
+        String TITLE = PROJECTION[0];
+        String DISPLAY_NAME = PROJECTION[1];
+        String TRACK = PROJECTION[2];
+        String ALBUM_ID = PROJECTION[3];
+        String ALBUM = PROJECTION[4];
+        String ARTIST_ID = PROJECTION[5];
+        String ARTIST = PROJECTION[6];
+        @Deprecated
+        String DATA = PROJECTION[7];
+        String DATE_ADDED = PROJECTION[8];
+        String DURATION = PROJECTION[9];
+        String ID = PROJECTION[10];
+
+        String IS_MUSIC = MediaStore.Audio.Media.IS_MUSIC;
+    }
+
+    @Deprecated
+    interface ProjectionPlaylists {
+        /**
+         * projection array
+         */
+        String[] PROJECTION = getProjectionPlaylists();
+
+        /**
+         * fast access to projection entries
+         */
+        String NAME = PROJECTION[0];
+        String ID = PROJECTION[1];
+
+        String DATE_ADDED = MediaStore.Audio.Playlists.DATE_ADDED;
+        String DATE_MODIFIED = MediaStore.Audio.Playlists.DATE_MODIFIED;
+    }
+
+    @Deprecated
+    interface ProjectionPlaylistTracks {
+        /**
+         * projection array
+         */
+        String[] PROJECTION = getProjectionPlaylistTracks();
+
+        /**
+         * fast access to projection entries
+         */
+        String TITLE = PROJECTION[0];
+        String DISPLAY_NAME = PROJECTION[1];
+        String TRACK = PROJECTION[2];
+        String ALBUM_ID = PROJECTION[3];
+        String ALBUM = PROJECTION[4];
+        String ARTIST_ID = PROJECTION[5];
+        String ARTIST = PROJECTION[6];
+        String ID = PROJECTION[7];
+        String AUDIO_ID = PROJECTION[8];
+        String DURATION = PROJECTION[9];
+
+        String PLAY_ORDER = MediaStore.Audio.Playlists.Members.PLAY_ORDER;
+    }
+
+    private static String[] getProjectionAlbums() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return new String[]{
+                    MediaStore.Audio.Albums.ALBUM,
+                    MediaStore.Audio.Albums.NUMBER_OF_SONGS,
+                    MediaStore.Audio.Albums.ALBUM_ART,
+                    MediaStore.Audio.Albums.ARTIST,
+                    MediaStore.Audio.Albums.FIRST_YEAR,
+                    MediaStore.Audio.Albums.LAST_YEAR,
+                    MediaStore.Audio.Albums.ALBUM_ID,
+                    MediaStore.Audio.Albums.ARTIST_ID
+            };
+        } else {
+            return new String[]{
+                    MediaStore.Audio.Albums.ALBUM,
+                    MediaStore.Audio.Albums.NUMBER_OF_SONGS,
+                    MediaStore.Audio.Albums.ALBUM_ART,
+                    MediaStore.Audio.Albums.ARTIST,
+                    MediaStore.Audio.Albums.FIRST_YEAR,
+                    MediaStore.Audio.Albums.LAST_YEAR,
+                    BaseColumns._ID
+            };
+        }
+    }
+
+    private static String[] getProjectionArtists() {
+        return new String[]{
+                MediaStore.Audio.Artists.ARTIST,
+                MediaStore.Audio.Artists.NUMBER_OF_TRACKS,
+                MediaStore.Audio.Artists.NUMBER_OF_ALBUMS,
+                BaseColumns._ID,
+        };
+    }
+
+    private static String[] getProjectionTracks() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return new String[]{
+                    MediaStore.Audio.Media.TITLE,
+                    MediaStore.Audio.Media.DISPLAY_NAME,
+                    MediaStore.Audio.Media.TRACK,
+                    MediaStore.Audio.Media.ALBUM_ID,
+                    MediaStore.Audio.Media.ALBUM,
+                    MediaStore.Audio.Media.ARTIST_ID,
+                    MediaStore.Audio.Media.ARTIST,
+                    MediaStore.Audio.Media.DATA,
+                    MediaStore.Audio.Media.DATE_ADDED,
+                    MediaStore.MediaColumns.DURATION,
+                    BaseColumns._ID,
+            };
+        } else {
+            return new String[]{
+                    MediaStore.Audio.Media.TITLE,
+                    MediaStore.Audio.Media.DISPLAY_NAME,
+                    MediaStore.Audio.Media.TRACK,
+                    MediaStore.Audio.Media.ALBUM_ID,
+                    MediaStore.Audio.Media.ALBUM,
+                    MediaStore.Audio.Media.ARTIST_ID,
+                    MediaStore.Audio.Media.ARTIST,
+                    MediaStore.Audio.Media.DATA,
+                    MediaStore.Audio.Media.DATE_ADDED,
+                    MediaStore.Audio.AudioColumns.DURATION,
+                    BaseColumns._ID,
+            };
+        }
+    }
+
+    @Deprecated
+    private static String[] getProjectionPlaylists() {
+        return new String[]{
+                MediaStore.Audio.Playlists.NAME,
+                BaseColumns._ID
+        };
+    }
+
+    @Deprecated
+    private static String[] getProjectionPlaylistTracks() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return new String[]{
+                    MediaStore.Audio.Playlists.Members.TITLE,
+                    MediaStore.Audio.Playlists.Members.DISPLAY_NAME,
+                    MediaStore.Audio.Playlists.Members.TRACK,
+                    MediaStore.Audio.Playlists.Members.ALBUM_ID,
+                    MediaStore.Audio.Playlists.Members.ALBUM,
+                    MediaStore.Audio.Playlists.Members.ARTIST_ID,
+                    MediaStore.Audio.Playlists.Members.ARTIST,
+                    MediaStore.Audio.Playlists.Members._ID,
+                    MediaStore.Audio.Playlists.Members.AUDIO_ID,
+                    MediaStore.MediaColumns.DURATION
+            };
+        } else {
+            return new String[]{
+                    MediaStore.Audio.Playlists.Members.TITLE,
+                    MediaStore.Audio.Playlists.Members.DISPLAY_NAME,
+                    MediaStore.Audio.Playlists.Members.TRACK,
+                    MediaStore.Audio.Playlists.Members.ALBUM_ID,
+                    MediaStore.Audio.Playlists.Members.ALBUM,
+                    MediaStore.Audio.Playlists.Members.ARTIST_ID,
+                    MediaStore.Audio.Playlists.Members.ARTIST,
+                    MediaStore.Audio.Playlists.Members._ID,
+                    MediaStore.Audio.Playlists.Members.AUDIO_ID,
+                    MediaStore.Audio.AudioColumns.DURATION,
+            };
+        }
+    }
+}

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWidgetBackground">
+
+    <ImageView
+        android:id="@+id/widget_covert_artwork"
+        android:layout_width="96dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/icons8_boombox_96"
+        android:contentDescription="@null" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="4dp"
+        android:layout_toEndOf="@+id/widget_covert_artwork"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/widget_track_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-regular"
+            android:singleLine="true"
+            android:textColor="@android:color/primary_text_dark"
+            android:textSize="@dimen/material_font_style_size_subheading" />
+
+        <TextView
+            android:id="@+id/widget_artist_album"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-regular"
+            android:singleLine="true"
+            android:textColor="@android:color/secondary_text_dark"
+            android:textSize="@dimen/material_font_style_size_body_1" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:maxHeight="48dp">
+
+            <ImageButton
+                android:id="@+id/widget_prev_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?android:selectableItemBackground"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_skip_previous_48dp"
+                android:tint="@android:color/primary_text_dark"
+                android:contentDescription="@null" />
+
+            <ImageButton
+                android:id="@+id/widget_play_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?android:selectableItemBackground"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_play_arrow_48dp"
+                android:tint="@android:color/primary_text_dark"
+                android:contentDescription="@null" />
+
+            <ImageButton
+                android:id="@+id/widget_next_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?android:selectableItemBackground"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_skip_next_48dp"
+                android:tint="@android:color/primary_text_dark"
+                android:contentDescription="@null" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
